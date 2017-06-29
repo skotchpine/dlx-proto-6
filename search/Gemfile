@@ -1,0 +1,18 @@
+source 'https://rubygems.org'
+
+ruby '2.4.1'
+
+gem 'sinatra'
+
+gem 'sequel'
+gem 'sqlite3'
+
+gem 'bcrypt'
+gem 'jwt'
+
+gem 'yt'
+
+group :development, :test do
+  gem 'rspec'
+  gem 'ffaker'
+end

@@ -1,0 +1,56 @@
+version: "3.2"
+
+services:
+  users:
+    build: ./users
+    args:
+      port: ${USERS_PORT}
+    ports:
+      - ${USERS_PORT}:${USERS_PORT}
+    environment:
+      - USERS_DB=users_db:${USERS_DB_PORT}
+    networks:
+      dlx:
+        aliases:
+          - users
+
+  users_db:
+    build: ./users_db
+    ports:
+      - ${USERS_DB_PORT}:${USERS_DB_PORT}
+    networks:
+      dlx:
+        aliases:
+          - users_db
+
+  search:
+    build: ./search
+    ports:
+      - ${SEARCH_PORT}:${SEARCH_PORT}
+    networks:
+      dlx:
+        aliases:
+          - search
+
+  tags:
+    build: ./tags
+    ports:
+      - ${TAGS_PORT}:${TAGS_PORT}
+    environment:
+      - TAGS_DB_PORT=tags_db:${TAGS_DB_PORT}
+    networks:
+      dlx:
+        aliases:
+          - tags
+
+  tags_db:
+    build: ./tags_db
+    ports:
+      - ${TAGS_DB_PORT}:${TAGS_DB_PORT}
+    networks:
+      dlx:
+        aliases:
+          - tags_db
+
+networks:
+  dlx:
