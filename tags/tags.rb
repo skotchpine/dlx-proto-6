@@ -1,9 +1,18 @@
+#!/usr/bin/env ruby
+
 require 'sequel'
 require 'sinatra'
 
 load File.join(__dir__, 'config.rb')
 
-Database = Sequel.sqlite(File.join(__dir__, 'tags.sqlite')
+p DB_PATH = ENV['TAGS_DB_PATH']
+p DB_USER = ENV['TAGS_DB_USER']
+p DB_PASS = ENV['TAGS_DB_PASS']
+p DB_NAME = ENV['TAGS_DB_NAME']
+
+sleep 4
+
+Database = Sequel.connect("postgres://#{DB_USER}:#{DB_PASS}@#{DB_PATH}/#{DB_NAME}")
 Database.run <<~SQL
   CREATE TABLE IF NOT EXISTS tags
   ( start VARCHAR(255) NOT NULL
@@ -17,8 +26,9 @@ SQL
 
 get '/tags/index' do
   authenticate
-  tags = Database[:tags].select(:start, :stop, :name, :uuid, :url).to_a
-  rep 200, tags 
+  tags = Database[:tags]
+           .select(:start, :stop, :name, :uuid, :url).to_a
+  rep 200, tags: tags 
 end
 
 post '/tags/create' do
@@ -36,7 +46,7 @@ post '/tags/create' do
     url:   params[:url],
     uuid:  uuid
 
-  rep 200, uuid
+  rep 200, uuid: uuid
 end
 
 get '/tags/:uuid/show' do
@@ -46,7 +56,7 @@ get '/tags/:uuid/show' do
   tag = Database[:tags]
           .select(:start, :stop, :name, :uuid, :url)
           .where(uuid: uuid)
-  rep 200, tag
+  rep 200, tag: tag
 end
 
 post '/tags/:uuid/update' do

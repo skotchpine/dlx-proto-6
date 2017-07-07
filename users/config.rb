@@ -1,6 +1,7 @@
+set :bind, '0.0.0.0'
 set :port, ENV['PORT']
-set :dump_errors, true
-set :show_exceptions, false
+#set :dump_errors, true
+#set :show_exceptions, false
 
 before { content_type :json }
 
@@ -12,13 +13,13 @@ helpers do
   def authenticate
     rep 300 unless params[:token]
 
-    uri = URI('http://localhost:4000/authenticate')
+    uri = URI("http://users:#{ENV['USERS_PORT']}/authenticate")
     http = Net::HTTP.new(uri.host, uri.port)
 
-    params = URI.encode_www_form(token: params[:token])
-    rep = http.post(uri.path, params)
+    args = URI.encode_www_form(token: params[:token])
+    response = http.post(uri.path, args)
 
-    rep 300 unless rep.is_a?(Net::HTTPSuccess)
+    rep 300 unless response.is_a?(Net::HTTPSuccess)
   end
 end
 

@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '2.4.0'
+ruby '2.4.1'
 
 gem 'sinatra'
 
@@ -9,10 +9,3 @@ gem 'pg'
 
 gem 'bcrypt'
 gem 'jwt'
-
-gem 'yt'
-
-group :development, :test do
-  gem 'rspec'
-  gem 'ffaker'
-end

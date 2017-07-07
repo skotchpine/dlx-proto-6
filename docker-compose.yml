@@ -1,56 +1,90 @@
 version: "3.2"
 
+volumes:
+  users_data:
+  tags_data:
+
+networks:
+  dlx:
+
 services:
-  users:
-    build: ./users
-    args:
-      port: ${USERS_PORT}
-    ports:
-      - ${USERS_PORT}:${USERS_PORT}
-    environment:
-      - USERS_DB=users_db:${USERS_DB_PORT}
-    networks:
-      dlx:
-        aliases:
-          - users
-
-  users_db:
-    build: ./users_db
-    ports:
-      - ${USERS_DB_PORT}:${USERS_DB_PORT}
-    networks:
-      dlx:
-        aliases:
-          - users_db
-
   search:
     build: ./search
     ports:
-      - ${SEARCH_PORT}:${SEARCH_PORT}
+      - "${SEARCH_PORT}:${SEARCH_PORT}"
+    environment:
+      - PORT=${SEARCH_PORT}
+      - USERS_PORT=${USERS_PORT}
     networks:
       dlx:
         aliases:
           - search
 
+  users:
+    build: ./users
+    ports:
+      - "${USERS_PORT}:${USERS_PORT}"
+    environment:
+      - PORT=${USERS_PORT}
+      - USERS_DB_PATH=users_db:${USERS_DB_PORT}
+      - USERS_DB_NAME=${USERS_DB_NAME}
+      - USERS_DB_USER=${USERS_DB_USER}
+      - USERS_DB_PASS=${USERS_DB_PASS}
+    depends_on:
+      - users_db
+    networks:
+      dlx:
+        aliases:
+          - users
+
   tags:
     build: ./tags
     ports:
-      - ${TAGS_PORT}:${TAGS_PORT}
+      - "${TAGS_PORT}:${TAGS_PORT}"
     environment:
-      - TAGS_DB_PORT=tags_db:${TAGS_DB_PORT}
+      - PORT=${TAGS_PORT}
+      - USERS_PORT=${USERS_PORT}
+      - TAGS_DB_PATH=tags_db:${TAGS_DB_PORT}
+      - TAGS_DB_NAME=${TAGS_DB_NAME}
+      - TAGS_DB_USER=${TAGS_DB_USER}
+      - TAGS_DB_PASS=${TAGS_DB_PASS}
+    depends_on:
+      - tags_db
     networks:
       dlx:
         aliases:
           - tags
 
-  tags_db:
-    build: ./tags_db
+  users_db:
+    image: postgres:9.2.21-alpine
     ports:
-      - ${TAGS_DB_PORT}:${TAGS_DB_PORT}
+      - "${USERS_DB_PORT}:${USERS_DB_PORT}"
+    command: -p ${USERS_DB_PORT}
+    environment:
+      PGDATA: /data
+      POSTGRES_DB: ${USERS_DB_NAME}
+      POSTGRES_USER: ${USERS_DB_USER}
+      POSTGRES_PASSWORD: ${USERS_DB_PASS}
+    volumes:
+      - users_data:/data
+    networks:
+      dlx:
+        aliases:
+          - users_db
+
+  tags_db:
+    image: postgres:9.2.21-alpine
+    ports:
+      - "${TAGS_DB_PORT}:${TAGS_DB_PORT}"
+    command: -p ${TAGS_DB_PORT}
+    environment:
+      PGDATA: /data
+      POSTGRES_DB: ${TAGS_DB_NAME}
+      POSTGRES_USER: ${TAGS_DB_USER}
+      POSTGRES_PASSWORD: ${TAGS_DB_PASS}
+    volumes:
+      - tags_data:/data
     networks:
       dlx:
         aliases:
           - tags_db
-
-networks:
-  dlx:

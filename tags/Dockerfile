@@ -9,7 +9,7 @@ ADD Gemfile /
 
 RUN bundle install
 
-ADD users.rb /
+ADD tags.rb /
 ADD config.rb /
 
-CMD ["/users.rb"]
+CMD ["/tags.rb"]

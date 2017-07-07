@@ -1,5 +1,6 @@
+#!/usr/bin/env ruby
+
 require 'yt'
-require 'json'
 require 'sinatra'
 
 load File.join(__dir__, 'config.rb')
@@ -25,5 +26,5 @@ post '/search' do
         }
       end
 
-  rep 200, results
+  rep 200, results: results
 end

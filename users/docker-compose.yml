@@ -1,0 +1,43 @@
+version: "3.2"
+
+volumes:
+  users_db:
+
+networks:
+  users:
+
+services:
+  users:
+    build: ./
+    expose:
+      - 1333
+    ports:
+      - 1333:1333
+    environment:
+      - PORT=1333
+      - USERS_DB_PATH=users_db:5432
+      - USERS_DB_NAME=users
+      - USERS_DB_USER=userman
+      - USERS_DB_PASS=userman
+    depends_on:
+      - users_db
+    networks:
+      users:
+        aliases:
+          - users
+
+  users_db:
+    image: postgres:9.2.21-alpine
+    ports:
+      - 5432:5432
+    environment:
+      PGDATA: /data
+      POSTGRES_DB: users
+      POSTGRES_USER: userman
+      POSTGRES_PASSWORD: userman
+    volumes:
+      - users_db:/data
+    networks:
+      users:
+        aliases:
+          - users_db
